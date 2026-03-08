@@ -1,7 +1,0 @@
-/home/haikus/Desktop/CODING/PasswordManager/PasswordManager/build/Desktop-Debug/CMakeFiles/PasswordManager.dir
-/home/haikus/Desktop/CODING/PasswordManager/PasswordManager/build/Desktop-Debug/CMakeFiles/edit_cache.dir
-/home/haikus/Desktop/CODING/PasswordManager/PasswordManager/build/Desktop-Debug/CMakeFiles/rebuild_cache.dir
-/home/haikus/Desktop/CODING/PasswordManager/PasswordManager/build/Desktop-Debug/CMakeFiles/list_install_components.dir
-/home/haikus/Desktop/CODING/PasswordManager/PasswordManager/build/Desktop-Debug/CMakeFiles/install.dir
-/home/haikus/Desktop/CODING/PasswordManager/PasswordManager/build/Desktop-Debug/CMakeFiles/install/local.dir
-/home/haikus/Desktop/CODING/PasswordManager/PasswordManager/build/Desktop-Debug/CMakeFiles/install/strip.dir
