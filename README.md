@@ -1,2 +1,2 @@
-# urban-chainsaw
+# PasswordManager
 A C++ password manager with AES encryption and Qt gui
