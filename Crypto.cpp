@@ -73,3 +73,36 @@ bool Crypto::deriveKey(const std::string &password,
 
     return result == 0;
 }
+
+std::vector<unsigned char> Crypto::encrypt (const std::string& plaintext,
+                                            const std::string& password)
+{
+    // Generate random salt (16 bytes)
+    unsigned char salt[crypto_pwhash_SALTBYTES];
+    randombytes_buf(salt, crypto_pwhash_SALTBYTES);
+    // Derive the encryption key from password + salt
+    unsigned char key [crypto_secretbox_KEYBYTES];
+    deriveKey(password, salt, key);
+    //Generate random nonce (24bytes)
+    unsigned char nonce [crypto_secretbox_NONCEBYTES];
+    randombytes_buf(nonce, crypto_secretbox_NONCEBYTES);
+    //Encrypt the plaintext
+    // Ciphertext will be plaintext length + 16 bytes for auth tag
+    std::vector<unsigned char> ciphertext(plaintext.length() + crypto_secretbox_MACBYTES);
+    crypto_secretbox_easy(ciphertext.data(),
+                      reinterpret_cast<const unsigned char*>(plaintext.c_str()),
+                      plaintext.length(),
+                      nonce,
+                      key);
+// Pack: [salt (16 bytes)][nonce (24 bytes)][ciphertext]
+std::vector<unsigned char> result;
+result.reserve(crypto_pwhash_SALTBYTES + crypto_secretbox_NONCEBYTES + ciphertext.size());
+
+result.insert(result.end(), salt, salt + crypto_pwhash_SALTBYTES);
+result.insert(result.end(), nonce, nonce + crypto_secretbox_NONCEBYTES);
+result.insert(result.end(), ciphertext.begin(), ciphertext.end());
+
+return result;
+}
+
+
