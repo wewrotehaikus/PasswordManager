@@ -18,8 +18,19 @@ add_executable(PasswordManager
     Crypto.cpp
 )
 
-target_include_directories(PasswordManager PRIVATE ${SODIUM_INCLUDE_DIRS})
-target_link_libraries(PasswordManager PRIVATE ${SODIUM_LIBRARIES})
+target_include_directories(PasswordManager PRIVATE 
+    ${SODIUM_INCLUDE_DIRS}
+    /opt/homebrew/include
+)
+
+target_link_directories(PasswordManager PRIVATE
+    /opt/homebrew/lib
+)
+
+target_link_libraries(PasswordManager PRIVATE 
+    ${SODIUM_LIBRARIES}
+    sodium
+)
 
 include(GNUInstallDirs)
 install(TARGETS PasswordManager

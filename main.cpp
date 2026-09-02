@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Vault.h"
+#include "Crypto.h"
 
 /*int main() {
     PasswordEntry entry ("Gmail",
@@ -19,6 +20,13 @@
 */
 
 int main(){
+    // Initialize libsodium first
+        if (!Crypto::initialize())
+    {
+        std::cerr << "Failed to initialize libsodium\n";
+        return 1;
+    }
+
     //Create a Vault with a master password
     Vault vault("myMasterPassword123");
 
@@ -49,6 +57,7 @@ int main(){
     std::cout << "\nVault locked. Trying to add entry..." << std::endl;
     vault.addEntry(PasswordEntry("Spotify", "john", "spot123", "", ""));
     std::cout << "Total entries after attempted add: " << vault.entryCount() << std::endl;
+
 
     return 0;
 }
