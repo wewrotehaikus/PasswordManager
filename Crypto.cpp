@@ -8,6 +8,7 @@
 // higher == more secure but slower
 static constexpr unsigned long long OPSLIMIT = crypto_pwhash_argon2i_OPSLIMIT_MODERATE;
 static constexpr size_t MEMLIMIT = crypto_pwhash_argon2i_MEMLIMIT_MODERATE;
+static constexpr size_t SALTBYTES = 16;
 
 bool Crypto::initialize()
 {
@@ -78,8 +79,8 @@ std::vector<unsigned char> Crypto::encrypt (const std::string& plaintext,
                                             const std::string& password)
 {
     // Generate random salt (16 bytes)
-    unsigned char salt[crypto_pwhash_SALTBYTES];
-    randombytes_buf(salt, crypto_pwhash_SALTBYTES);
+    unsigned char salt[SALTBYTES];
+    randombytes_buf(salt, SALTBYTES);
     // Derive the encryption key from password + salt
     unsigned char key [crypto_secretbox_KEYBYTES];
     deriveKey(password, salt, key);
@@ -96,13 +97,56 @@ std::vector<unsigned char> Crypto::encrypt (const std::string& plaintext,
                       key);
 // Pack: [salt (16 bytes)][nonce (24 bytes)][ciphertext]
 std::vector<unsigned char> result;
-result.reserve(crypto_pwhash_SALTBYTES + crypto_secretbox_NONCEBYTES + ciphertext.size());
+result.reserve(SALTBYTES + crypto_secretbox_NONCEBYTES + ciphertext.size());
 
-result.insert(result.end(), salt, salt + crypto_pwhash_SALTBYTES);
+result.insert(result.end(), salt, salt + SALTBYTES); 
 result.insert(result.end(), nonce, nonce + crypto_secretbox_NONCEBYTES);
 result.insert(result.end(), ciphertext.begin(), ciphertext.end());
 
 return result;
 }
 
+std::string Crypto::decrypt(const std::vector<unsigned char>& ciphertext,
+                            const std::string& password)
+{
+    // Extract salt from the beginning of the ciphertext
+    if (ciphertext.size() < SALTBYTES + crypto_secretbox_NONCEBYTES)
+        throw std::runtime_error("Ciphertext too short");
+
+    unsigned char salt[SALTBYTES];
+    std::copy(ciphertext.begin(),
+              ciphertext.begin() + SALTBYTES,
+              salt);
+    // Extract nonce from bytes 16-39
+    unsigned char nonce[crypto_secretbox_NONCEBYTES];
+    std::copy(ciphertext.begin() + SALTBYTES,
+              ciphertext.begin() + SALTBYTES + crypto_secretbox_NONCEBYTES,
+              nonce);
+    // Extract encrypted data (everything after salt + nonce)
+    std::vector<unsigned char> encrypted_data(
+        ciphertext.begin() + SALTBYTES + crypto_secretbox_NONCEBYTES,
+        ciphertext.end()
+    );
+
+    //Derive key from password + extracted salt
+    unsigned char key[crypto_secretbox_KEYBYTES];
+    deriveKey(password, salt, key);
+
+    //Decrypt the data
+    std::vector<unsigned char> plaintext_bytes(encrypted_data.size() - crypto_secretbox_MACBYTES);
+    int result = crypto_secretbox_open_easy(
+        plaintext_bytes.data(),
+        encrypted_data.data(),
+        encrypted_data.size(),
+        nonce,
+        key
+    );
+
+    if (result != 0) {
+        throw std::runtime_error("Decryption failed: Invalid password or corrupted data");
+    }
+
+    // Convert plaintext bytes to std::string and return
+    return std::string(plaintext_bytes.begin(), plaintext_bytes.end());
+}
 
