@@ -132,6 +132,7 @@ std::string Crypto::decrypt(const std::vector<unsigned char>& ciphertext,
     unsigned char key[crypto_secretbox_KEYBYTES];
     deriveKey(password, salt, key);
 
+
     //Decrypt the data
     std::vector<unsigned char> plaintext_bytes(encrypted_data.size() - crypto_secretbox_MACBYTES);
     int result = crypto_secretbox_open_easy(
