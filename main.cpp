@@ -58,6 +58,17 @@ int main(){
     vault.addEntry(PasswordEntry("Spotify", "john", "spot123", "", ""));
     std::cout << "Total entries after attempted add: " << vault.entryCount() << std::endl;
 
+    // Test encryption/decryption
+std::string originalPassword = "MySecretPassword123!";
+std::string masterPassword = "MasterPassphrase";
+
+auto encrypted = Crypto::encrypt(originalPassword, masterPassword);
+std::cout << "\nEncrypted data size: " << encrypted.size() << " bytes\n";
+
+std::string decrypted = Crypto::decrypt(encrypted, masterPassword);
+std::cout << "Original:  " << originalPassword << "\n";
+std::cout << "Decrypted: " << decrypted << "\n";
+std::cout << "Match: " << (originalPassword == decrypted ? "✓ YES" : "✗ NO") << "\n";
 
     return 0;
 }
