@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Vault.h"
 #include "Crypto.h"
+#include <QApplication>
+#include "LoginWindow.h"
 
 /*int main() {
     PasswordEntry entry ("Gmail",
@@ -19,7 +21,7 @@
 }
 */
 
-int main(){
+int main(int argc, char *argv[]){
     // Initialize libsodium first
         if (!Crypto::initialize())
     {
@@ -27,6 +29,17 @@ int main(){
         return 1;
     }
 
+    //Create Qt application
+    QApplication app(argc, argv);
+
+    // Create and show login window
+    LoginWindow window;
+    window.show();
+
+    //Start Qt event loop
+    return app.exec();
+
+    /*
     //Create a Vault with a master password
     Vault vault("myMasterPassword123");
 
@@ -69,6 +82,7 @@ std::string decrypted = Crypto::decrypt(encrypted, masterPassword);
 std::cout << "Original:  " << originalPassword << "\n";
 std::cout << "Decrypted: " << decrypted << "\n";
 std::cout << "Match: " << (originalPassword == decrypted ? "✓ YES" : "✗ NO") << "\n";
+*/
 
     return 0;
 }
